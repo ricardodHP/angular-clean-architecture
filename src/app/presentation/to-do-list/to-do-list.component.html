@@ -1,0 +1,18 @@
+<!-- Floating Action Button like Google Material -->
+<!--<div id="actions" class="menu pmd-floating-action" role="navigation">-->
+<!--  <a class="float-btn pmd-floating-action-btn  pmd-btn-fab pmd-btn-raised pmd-ripple-effect btn-primary"-->
+<!--     data-title="Add" href="javascript:void(0);" (click)="openModalAdd()">-->
+<!--    <span class="pmd-floating-hidden">Primary</span>-->
+<!--    <i class="mdi mdi-plus pmd-sm"></i>-->
+<!--  </a>-->
+<!--</div>-->
+
+<h1>To-do List</h1>
+<div class="col-12 card shadow mt-3 p-3">
+  <div class="d-flex justify-content-end">
+    <input class="form-control w-25" placeholder="Search..." id="search-input">
+  </div>
+  <div [innerHTML]="htmlTable" class="overflow-auto h-100 mt-1"></div>
+</div>
+
+<!--<app-modal-add (modalResponse)="modalResponse($event)"></app-modal-add>-->
