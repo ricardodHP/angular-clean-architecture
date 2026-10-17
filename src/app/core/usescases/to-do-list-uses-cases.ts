@@ -1,37 +1,34 @@
-import {Injectable} from '@angular/core';
-import {ToDoListRepository} from '../repositories/to-do-list-repository';
-import {Observable} from 'rxjs';
-import {Response} from '../common/response';
-import {ToDoListModel} from '../domain/to-do-list.model';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { Response } from '../common/response';
+import { ToDoListModel } from '../domain/to-do-list.model';
+import { ToDoListRepository } from '../repositories/to-do-list-repository';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class ToDoListUsesCases {
-  constructor(private toDoListRepository: ToDoListRepository) {
-  }
+  constructor(private readonly repository: ToDoListRepository) {}
 
   createTodoItem(body: ToDoListModel): Observable<Response> {
-    return this.toDoListRepository.createTodoItem(body);
+    return this.repository.createTodoItem(body);
   }
 
   getTodoItemDetail(id: number): Observable<ToDoListModel> {
-    return this.toDoListRepository.getTodoItemDetail(id);
+    return this.repository.getTodoItemDetail(id);
   }
 
-  findAllTodo(): Observable<ToDoListModel> {
-    return this.toDoListRepository.findAllTodo();
+  findAllTodo(): Observable<ToDoListModel[]> {
+    return this.repository.findAllTodo();
   }
 
   updateTodoItem(id: number, body: ToDoListModel): Observable<Response> {
-    return this.toDoListRepository.updateTodoItem(id, body);
+    return this.repository.updateTodoItem(id, body);
   }
 
   updateTodoItemStatus(id: number, body: ToDoListModel): Observable<Response> {
-    return this.toDoListRepository.updateTodoItemStatus(id, body);
+    return this.repository.updateTodoItemStatus(id, body);
   }
 
   deleteTodoItem(id: number): Observable<Response> {
-    return this.toDoListRepository.deleteTodoItem(id);
+    return this.repository.deleteTodoItem(id);
   }
 }

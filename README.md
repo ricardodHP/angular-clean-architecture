@@ -1,27 +1,40 @@
-# CleanArchitecture
+# Angular Clean Architecture — To-do List
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 11.0.7.
+A small Angular application demonstrating repository abstractions and separation between presentation, use cases, domain models, and data adapters.
 
-## Development server
+Originally created in **January 2021** with Angular 11. Its history is intentionally preserved so the evolution of the architecture can be reviewed.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+> **Modernization in progress.** This branch contains the first compatibility refactor, **not yet Angular 22**. Angular 11 is out of support. The framework upgrade, lockfile regeneration and full test run are still pending.
 
-## Code scaffolding
+## Current structure
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+- `src/app/core/domain` — To-do model
+- `src/app/core/repositories` — Repository contract
+- `src/app/core/usescases` — Application operations
+- `src/app/data` — HTTP repository and DTO mapper
+- `src/app/presentation` — Angular component and declarative template
 
-## Build
+The presentation calls use cases, which depend on a repository contract. The HTTP adapter implements that contract.
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+## Changes in the first modernization step
 
-## Running unit tests
+- Replaced manual HTML string generation and `[innerHTML]` with Angular's `*ngFor` and data bindings.
+- Removed the legacy `drawTable()` utility.
+- Removed Bootstrap and jQuery as direct dependencies (the lockfile will be regenerated during framework migration).
+- Corrected `findAllTodo()` to return `Observable<ToDoListModel[]>`.
+- Added loading, empty, error and basic filtering states.
+- Added focused component and HTTP repository tests.
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+## Limitations
 
-## Running end-to-end tests
+- The Angular CLI and testing stack are still the original 2021 versions.
+- The configured HTTP API is external and has not been verified; a self-contained demo adapter is planned.
+- Remaining CRUD cases are not connected to the UI.
+- The use-case layer currently delegates operations and will be reviewed for meaningful application rules.
+- The project has **not yet been built or tested** in the modernization environment.
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+See [modernization plan](docs/MODERNIZATION.md).
 
-## Further help
+## Historical code
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+The `main` branch retains the original Angular 11 source until the modernization is reviewed and merged.

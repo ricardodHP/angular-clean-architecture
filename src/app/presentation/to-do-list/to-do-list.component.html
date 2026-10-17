@@ -1,18 +1,59 @@
-<!-- Floating Action Button like Google Material -->
-<!--<div id="actions" class="menu pmd-floating-action" role="navigation">-->
-<!--  <a class="float-btn pmd-floating-action-btn  pmd-btn-fab pmd-btn-raised pmd-ripple-effect btn-primary"-->
-<!--     data-title="Add" href="javascript:void(0);" (click)="openModalAdd()">-->
-<!--    <span class="pmd-floating-hidden">Primary</span>-->
-<!--    <i class="mdi mdi-plus pmd-sm"></i>-->
-<!--  </a>-->
-<!--</div>-->
+<section class="todo-page" aria-labelledby="page-title">
+  <header class="todo-header">
+    <div>
+      <h1 id="page-title">To-do List</h1>
+      <p>Tasks, presented with Angular templates instead of generated HTML.</p>
+    </div>
+    <span class="task-count" *ngIf="!loading && !errorMessage">
+      {{ filteredItems.length }} of {{ items.length }} tasks
+    </span>
+  </header>
 
-<h1>To-do List</h1>
-<div class="col-12 card shadow mt-3 p-3">
-  <div class="d-flex justify-content-end">
-    <input class="form-control w-25" placeholder="Search..." id="search-input">
+  <div class="todo-card">
+    <label class="search-label" for="task-search">Search tasks</label>
+    <input
+      id="task-search"
+      class="search-input"
+      type="search"
+      placeholder="Search by name or title"
+      [value]="searchTerm"
+      (input)="onSearch($event)"
+    />
+
+    <p class="status-message" *ngIf="loading" role="status">Loading tasks...</p>
+    <p class="status-message error" *ngIf="errorMessage" role="alert">{{ errorMessage }}</p>
+
+    <ng-container *ngIf="!loading && !errorMessage">
+      <div class="table-container" *ngIf="filteredItems.length; else emptyState">
+        <table>
+          <caption class="visually-hidden">Current to-do items</caption>
+          <thead>
+            <tr>
+              <th scope="col">ID</th>
+              <th scope="col">Name</th>
+              <th scope="col">Title</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let todo of filteredItems; trackBy: trackByTodoId">
+              <td>{{ todo.id }}</td>
+              <td>{{ todo.name }}</td>
+              <td>{{ todo.title }}</td>
+              <td>
+                <span class="status-pill" [class.completed]="todo.completed">
+                  {{ todo.completed ? 'Completed' : 'Pending' }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <ng-template #emptyState>
+        <p class="status-message">
+          {{ items.length ? 'No tasks match your search.' : 'No tasks available.' }}
+        </p>
+      </ng-template>
+    </ng-container>
   </div>
-  <div [innerHTML]="htmlTable" class="overflow-auto h-100 mt-1"></div>
-</div>
-
-<!--<app-modal-add (modalResponse)="modalResponse($event)"></app-modal-add>-->
+</section>

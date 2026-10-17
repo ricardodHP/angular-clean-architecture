@@ -1,7 +1,6 @@
-import {Component, OnInit} from '@angular/core';
-import {ToDoListUsesCases} from '../../core/usescases/to-do-list-uses-cases';
-import {Utils} from '../../sys/utils/utils';
-import {ToDoListModel} from '../../core/domain/to-do-list.model';
+import { Component, OnInit } from '@angular/core';
+import { ToDoListUsesCases } from '../../core/usescases/to-do-list-uses-cases';
+import { ToDoListModel } from '../../core/domain/to-do-list.model';
 
 @Component({
   selector: 'app-to-do-list',
@@ -9,23 +8,41 @@ import {ToDoListModel} from '../../core/domain/to-do-list.model';
   styleUrls: ['./to-do-list.component.css']
 })
 export class ToDoListComponent implements OnInit {
-  htmlTable: string;
-  items: Array<ToDoListModel>;
+  items: ToDoListModel[] = [];
+  filteredItems: ToDoListModel[] = [];
+  searchTerm = '';
+  loading = true;
+  errorMessage = '';
 
-  constructor(private toDoListUsesCases: ToDoListUsesCases,
-              private utils: Utils) {
-  }
+  constructor(private readonly useCases: ToDoListUsesCases) {}
 
   ngOnInit(): void {
-    this.toDoListUsesCases.findAllTodo().subscribe(response => {
-      console.log(response);
-      this.items = [];
-      this.items.push(response);
-
-      const tableTitles = ['id', 'Name', 'Title', 'Completed', 'Actions'];
-      const tableColumns = ['id', 'name', 'title', 'completed', 'custom-column'];
-      this.htmlTable = this.utils.drawTable(false, '', tableTitles, tableColumns, this.items);
+    this.useCases.findAllTodo().subscribe({
+      next: items => {
+        this.items = items;
+        this.applyFilter();
+        this.loading = false;
+      },
+      error: () => {
+        this.errorMessage = 'Unable to load tasks. Please try again later.';
+        this.loading = false;
+      }
     });
   }
 
+  onSearch(event: Event): void {
+    this.searchTerm = (event.target as HTMLInputElement).value;
+    this.applyFilter();
+  }
+
+  trackByTodoId(_index: number, todo: ToDoListModel): number {
+    return todo.id;
+  }
+
+  private applyFilter(): void {
+    const query = this.searchTerm.trim().toLowerCase();
+    this.filteredItems = this.items.filter(item =>
+      `${item.name} ${item.title}`.toLowerCase().includes(query)
+    );
+  }
 }

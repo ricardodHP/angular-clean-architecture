@@ -1,41 +1,47 @@
-import {Injectable} from '@angular/core';
-import {ToDoListRepository} from '../../../core/repositories/to-do-list-repository';
-import {Observable} from 'rxjs';
-import {ToDoListModel} from '../../../core/domain/to-do-list.model';
-import {ToDoListWebRepositoryMapper} from './to-do-list-web-repository-mapper';
-import {HttpClient} from '@angular/common/http';
-import {environment} from '../../../../environments/environment';
-import {Response} from '../../../core/common/response';
-import {map, mergeMap} from 'rxjs/operators';
-import {ToDoListWebEntity} from './to-do-list-web-entity';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { ToDoListRepository } from '../../../core/repositories/to-do-list-repository';
+import { ToDoListModel } from '../../../core/domain/to-do-list.model';
+import { Response } from '../../../core/common/response';
+import { environment } from '../../../../environments/environment';
+import { ToDoListWebEntity } from './to-do-list-web-entity';
+import { ToDoListWebRepositoryMapper } from './to-do-list-web-repository-mapper';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class ToDoListWebRepository extends ToDoListRepository {
-  mapper = new ToDoListWebRepositoryMapper();
+  private readonly mapper = new ToDoListWebRepositoryMapper();
 
-  constructor(private http: HttpClient) {
+  constructor(private readonly http: HttpClient) {
     super();
   }
 
-  createTodoItem = (body: ToDoListModel): Observable<Response> => this.http.post<Response>(environment.apiUrl + '/todo', body);
-
-  deleteTodoItem = (id: number): Observable<Response> => this.http.delete<Response>(environment.apiUrl + `/todo/${id}`);
-
-  findAllTodo = (): Observable<ToDoListModel> => {
-    return this.http.get<ToDoListWebEntity[]>(environment.apiUrl + '/todo')
-      .pipe(mergeMap(item => item))
-      .pipe(map(this.mapper.mapFrom));
+  createTodoItem(body: ToDoListModel): Observable<Response> {
+    return this.http.post<Response>(environment.apiUrl + '/todo', body);
   }
 
-  getTodoItemDetail = (id: number): Observable<ToDoListModel> => this.http.get<ToDoListWebEntity>(environment.apiUrl + `/todo/${id}`)
-    .pipe(map(this.mapper.mapFrom))
+  deleteTodoItem(id: number): Observable<Response> {
+    return this.http.delete<Response>(environment.apiUrl + `/todo/${id}`);
+  }
 
-  updateTodoItem = (id: number, body: ToDoListModel): Observable<Response> =>
-    this.http.put<Response>(environment.apiUrl + `/todo/${id}`, body)
+  findAllTodo(): Observable<ToDoListModel[]> {
+    return this.http.get<ToDoListWebEntity[]>(environment.apiUrl + '/todo').pipe(
+      map(items => items.map(item => this.mapper.mapFrom(item)))
+    );
+  }
 
-  updateTodoItemStatus = (id: number, body: ToDoListModel): Observable<Response> =>
-    this.http.patch<Response>(environment.apiUrl + `/todo/${id}`, body)
+  getTodoItemDetail(id: number): Observable<ToDoListModel> {
+    return this.http.get<ToDoListWebEntity>(environment.apiUrl + `/todo/${id}`).pipe(
+      map(item => this.mapper.mapFrom(item))
+    );
+  }
 
+  updateTodoItem(id: number, body: ToDoListModel): Observable<Response> {
+    return this.http.put<Response>(environment.apiUrl + `/todo/${id}`, body);
+  }
+
+  updateTodoItemStatus(id: number, body: ToDoListModel): Observable<Response> {
+    return this.http.patch<Response>(environment.apiUrl + `/todo/${id}`, body);
+  }
 }
