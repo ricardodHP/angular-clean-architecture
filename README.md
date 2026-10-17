@@ -2,7 +2,7 @@
 
 A small To-do List demonstrating how to revisit an Angular **11 (2021)** codebase using Angular **22 (2026)** without adding unnecessary architecture.
 
-> **Review status:** Implementation is available in the draft PR. Build and unit tests are run in GitHub Actions; review and browser verification remain necessary before merging to main.
+> **Review status:** Build, 14 unit tests, automated Chrome desktop/mobile smoke tests and a limited axe-core WCAG audit have passed in GitHub Actions. PR review and optional hands-on acceptance remain before merging to main.
 
 ## What the app does
 
@@ -56,3 +56,10 @@ The lockfile is committed and CI uses `npm ci` for reproducible installs.
 - [Modernization decisions](docs/MODERNIZATION.md)
 
 The goal is not to claim that every small UI needs Clean Architecture. It is to demonstrate dependency inversion and explain when abstractions help or become overhead.
+
+## Verification evidence
+
+- [Build and 14 unit tests](https://github.com/ricardodHP/angular-clean-architecture/actions/runs/39003793264)
+- [Browser E2E, responsive screenshots and axe-core audit](https://github.com/ricardodHP/angular-clean-architecture/actions/runs/39003793251)
+
+Automated accessibility checks cover a subset of WCAG rules; they do not replace a screen-reader evaluation. Visual screenshots were reviewed at desktop (1440 px) and mobile (390 px) widths. The demo remains intentionally nonpersistent.

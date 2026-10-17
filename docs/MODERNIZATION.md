@@ -46,10 +46,16 @@ The 2021 app used a third-party endpoint in development and a localhost endpoint
 - [x] GitHub Actions production build passed (initial validation).
 - [x] Domain, use case, and component tests passed (initial validation).
 - [x] GitHub Actions configured for npm ci.
-- [ ] Verify the updated tests and npm ci on the newest commit.
-- [ ] Manual browser review on desktop and mobile.
-- [ ] Keyboard accessibility smoke test.
-- [ ] Review input validation and presentation of repository errors.
+- [x] npm ci, production build and 14/14 tests passed in GitHub Actions.
+- [x] Browser interaction tests and screenshot review at 1440 px desktop and 390 px mobile; no horizontal overflow.
+- [x] Basic keyboard navigation and native form validation tested in Chromium.
+- [x] Reject and display whitespace-only title errors in the UI.
+- [ ] Add failure-path tests for asynchronous repository mutations and screen-reader review.
+- [x] Automated axe-core WCAG 2 A/AA and WCAG 2.1 AA rule audit reported zero violations on desktop and mobile; manually rechecked the low-contrast completed title styling.
 - [ ] Write LinkedIn Before/After post from actual, reviewed code.
 
 The PR is kept as a draft until the remaining gates pass.
+
+Validation sources: [latest build and unit tests](https://github.com/ricardodHP/angular-clean-architecture/actions/runs/39003793264), [browser smoke test and screenshots](https://github.com/ricardodHP/angular-clean-architecture/actions/runs/39003793251).
+
+Note: zero automated axe-core violations do not establish full accessibility conformance; a human screen-reader evaluation is outside this pass.
