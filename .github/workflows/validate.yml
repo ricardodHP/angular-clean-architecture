@@ -1,0 +1,32 @@
+name: Validate Angular modernization
+
+on:
+  push:
+    branches: [modernization/angular-22]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install dependencies and resolve initial lockfile
+        run: npm install --no-audit --no-fund
+      - name: Production build
+        run: npm run build
+      - name: Unit tests
+        run: npm test
+      - name: Export generated lockfile for review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: angular-22-lockfile
+          path: package-lock.json
+          if-no-files-found: ignore

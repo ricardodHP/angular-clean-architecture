@@ -1,69 +1,50 @@
-# Modernization plan — Angular Clean Architecture
+# Architecture modernization notes
 
-## Purpose
+## What changed
 
-Keep the 2021 To-do List as a small, reviewable example of how engineering decisions evolve. Avoid making the example complex merely to showcase patterns.
+| 2021 Angular 11 | 2026 Angular 22 |
+| --- | --- |
+| NgModules and module bootstrap | Standalone components and bootstrapApplication |
+| HTML generated as strings through drawTable() | Declarative templates with @if / @for |
+| jQuery and Bootstrap | Plain CSS |
+| Observable<Todo> from list query | Observable<readonly Todo[]> repository stream |
+| Angular service use-cases that mirror CRUD methods | Plain TypeScript application service with input validation and status transition |
+| HTTP adapter tied to an old mock API | In-memory adapter behind a repository contract |
+| Karma / Jasmine / Protractor / TSLint | Vitest and Angular testing utilities |
+| Zone.js-based change detection | Angular zoneless defaults |
 
-## Decisions
+## Dependency direction
 
-- Preserve Git history and keep `main` untouched until review.
-- Retain the To-do domain and repository abstraction.
-- Eliminate HTML-string generation, `[innerHTML]`, jQuery and Bootstrap 4.
-- Separate the compatibility cleanup from the Angular 22 migration.
-- Prefer standalone components, declarative control flow and focused Signals after upgrading.
-- Keep RxJS for asynchronous boundaries; do not force Signals everywhere.
-- Introduce a self-contained demo adapter before relying on any remote backend.
-- Include meaningful tests of dependency direction, mapping and application behavior.
-- Avoid NgRx, CQRS, event buses, feature flags and new dependencies without a demonstrated need.
+\`\`\`text
+Presentation (Angular component)
+   -> Application (use cases)
+      -> Port (TodoRepository) -> Domain (Todo)
+         ^
+         |
+      Data adapter (InMemoryTodoRepository)
+\`\`\`
 
-## Phase 1 — Cleanup on Angular 11
+The arrows in this diagram represent source-code dependencies, not runtime call direction.
 
-- [x] Replace `drawTable()` with declarative Angular templates.
-- [x] Return `Observable<ToDoListModel[]>` for list query.
-- [x] Remove direct Bootstrap and jQuery dependencies from `package.json`.
-- [x] Add component and repository tests.
-- [ ] Run installs/builds/tests under a compatible historical Node environment.
-- [ ] Regenerate the lockfile and validate no orphaned packages remain.
+## Why an in-memory adapter?
 
-## Phase 2 — Framework upgrade
+The 2021 app used a third-party endpoint in development and a localhost endpoint in production. A public educational example should not rely on either. Swapping the adapter in the composition root also demonstrates dependency inversion.
 
-- [ ] Target Angular 22 with a **supported Node version** (22.22.3+, 24.15+ or 26+).
-- [ ] Recreate CLI workspace tooling with a reproducible lockfile.
-- [ ] Convert NgModules to standalone and HTTP providers.
-- [ ] Convert `*ngFor`/`*ngIf` to modern built-in template control flow where clearer.
-- [ ] Adopt Signals for UI state only where they simplify the model.
-- [ ] Replace deprecated TSLint, Protractor and Karma tooling.
-- [ ] Build, lint, and run tests in CI.
+## Deliberate limits
 
-## Phase 3 — Architectural improvements
+- No NgRx: local component Signals are sufficient.
+- No API, database, authentication or persistence: this is a small architecture example.
+- No mapper until the input and persistence schemas actually differ.
+- No Angular dependency in core domain or use-case logic.
+- No use case class per CRUD operation.
+- No business rule for every single repository function.
+- Not a migration recipe from Angular 11 directly to 22 for production systems; this is a clean rebuild retaining the historical business scope and Git history.
 
-- [ ] Review use-case methods; do not preserve pass-through methods without purpose.
-- [ ] Separate domain types from HTTP DTOs only where the boundary matters.
-- [ ] Add meaningful application rules (e.g. nonblank task title and status transition).
-- [ ] Add an in-memory demo adapter with seeded To-dos.
-- [ ] Keep optional HTTP adapter as a replaceable boundary.
-- [ ] Exercise CRUD through UI using only supported adapters and validated inputs.
-- [ ] Test contracts, mapping, error handling and UI states.
+## Next gates
 
-## Phase 4 — Public example
-
-- [ ] Document dependencies and trade-offs in an architecture diagram.
-- [ ] Explain 2021 vs 2026 choices, including what was overengineering.
-- [ ] Capture verified screenshots and CI results.
-- [ ] Prepare a small LinkedIn Before/After example from reviewed code.
-
-## Acceptance criteria
-
-- `npm ci`, build and test succeed on the documented environment.
-- No runtime use of jQuery, `drawTable()` or `[innerHTML]`.
-- The To-do list loads and filters correctly; CRUD has predictable persistence semantics.
-- Core domain abstractions have no imports from infrastructure.
-- Tests include successful and failed repository calls.
-- The demo runs without a third-party API account.
-- No change reaches `main` without review.
-
-## Known review topics
-
-- The old `mapTo()` forces `id: 0`; redesign around creation DTOs.
-- The old external API URLs differ between development and production.
-- A small To-do app may not justify a use case per CRUD call; demonstrate the trade-off.
+- [ ] Verify npm dependency installation and regenerate lockfile.
+- [ ] Verify production build and all tests in GitHub Actions.
+- [ ] Switch CI to npm ci once lockfile is committed.
+- [ ] Review mobile layout and basic keyboard accessibility.
+- [ ] Add test cases for deletion, filtering empty states and failed repository mutations.
+- [ ] Write a LinkedIn post that accurately contrasts the 2021 code and the 2026 decisions.

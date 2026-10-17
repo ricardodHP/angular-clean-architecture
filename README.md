@@ -1,40 +1,58 @@
-# Angular Clean Architecture — To-do List
+# Angular Clean Architecture — 2026 refresh
 
-A small Angular application demonstrating repository abstractions and separation between presentation, use cases, domain models, and data adapters.
+A small To-do List demonstrating how to modernize an Angular **11 (2021)** example for Angular **22 (2026)** without adding unnecessary architecture.
 
-Originally created in **January 2021** with Angular 11. Its history is intentionally preserved so the evolution of the architecture can be reviewed.
+> **Work in progress:** The source has been reconstructed on the \`modernization/angular-22\` branch. Dependency installation, build and tests must pass in CI before this branch is considered ready to merge.
 
-> **Modernization in progress.** This branch contains the first compatibility refactor, **not yet Angular 22**. Angular 11 is out of support. The framework upgrade, lockfile regeneration and full test run are still pending.
+## What the app does
 
-## Current structure
+- List seeded tasks, create a task, mark tasks complete/incomplete, delete tasks.
+- Filter by title or category.
+- Show loading, empty and error states.
+- Run without any remote API or API key.
 
-- `src/app/core/domain` — To-do model
-- `src/app/core/repositories` — Repository contract
-- `src/app/core/usescases` — Application operations
-- `src/app/data` — HTTP repository and DTO mapper
-- `src/app/presentation` — Angular component and declarative template
+**Data is in memory and resets on page reload.** Persistent storage is intentionally out of scope for this demo.
 
-The presentation calls use cases, which depend on a repository contract. The HTTP adapter implements that contract.
+## Technology
 
-## Changes in the first modernization step
+- Angular 22, standalone components, built-in control flow (\`@if\`, \`@for\`)
+- Signals for presentation state; RxJS for the repository port
+- Angular's default zoneless change detection
+- Vitest tests with Angular TestBed
+- CSS without Bootstrap, jQuery, or a component framework
 
-- Replaced manual HTML string generation and `[innerHTML]` with Angular's `*ngFor` and data bindings.
-- Removed the legacy `drawTable()` utility.
-- Removed Bootstrap and jQuery as direct dependencies (the lockfile will be regenerated during framework migration).
-- Corrected `findAllTodo()` to return `Observable<ToDoListModel[]>`.
-- Added loading, empty, error and basic filtering states.
-- Added focused component and HTTP repository tests.
+## Structure
 
-## Limitations
+\`\`\`text
+src/app/
+  core/
+    domain/             Todo entity, input validation
+    ports/              Repository abstraction
+    use-cases/          Application operations
+  data/                 In-memory repository adapter
+  features/todo/        UI component and templates
+  app.config.ts         Composition root (dependency injection)
+\`\`\`
 
-- The Angular CLI and testing stack are still the original 2021 versions.
-- The configured HTTP API is external and has not been verified; a self-contained demo adapter is planned.
-- Remaining CRUD cases are not connected to the UI.
-- The use-case layer currently delegates operations and will be reviewed for meaningful application rules.
-- The project has **not yet been built or tested** in the modernization environment.
+The dependencies point inward: presentation uses the application layer; the in-memory repository implements an application port. Core classes do not import Angular.
 
-See [modernization plan](docs/MODERNIZATION.md).
+## Getting started
 
-## Historical code
+Use **Node 24.15+** or Node 22.22.3+; run \`nvm use\` if you use nvm.
 
-The `main` branch retains the original Angular 11 source until the modernization is reviewed and merged.
+\`\`\`bash
+npm install
+npm start
+npm run build
+npm test
+\`\`\`
+
+The first \`npm install\` creates a modern \`package-lock.json\`. Commit that lockfile after the CI checks succeed, and switch the CI install step to \`npm ci\` for reproducibility.
+
+## History
+
+- [Original source from January 2021](https://github.com/ricardodHP/angular-clean-architecture/tree/460c4b05bca83fbca2aa38022c52b1384ff6d6cd)
+- [Modernization branch](https://github.com/ricardodHP/angular-clean-architecture/tree/modernization/angular-22)
+- [Modernization decisions](docs/MODERNIZATION.md)
+
+The goal is not to claim that every small UI needs Clean Architecture. It is to demonstrate dependency inversion and explain when abstractions help or become overhead.
