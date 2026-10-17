@@ -1,0 +1,49 @@
+name: Browser UI review
+
+on:
+  push:
+    branches: [modernization/angular-22]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ui-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install locked project dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Install pinned browser automation (not a project dependency)
+        run: npm install --no-save --package-lock=false --no-audit --no-fund playwright@1.56.1
+      - name: Confirm Chrome availability
+        run: google-chrome --version
+      - name: Start Angular application
+        run: |
+          npm start -- --host 127.0.0.1 > /tmp/angular-devserver.log 2>&1 &
+          for i in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:4200/ > /dev/null; then
+              echo "Angular dev server ready"
+              exit 0
+            fi
+            sleep 2
+          done
+          cat /tmp/angular-devserver.log
+          exit 1
+      - name: Run browser behavior and responsive smoke tests
+        run: node scripts/verify-ui.mjs
+      - name: Upload review screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: angular-ui-review
+          path: |
+            artifacts/ui-review/
+            /tmp/angular-devserver.log
+          if-no-files-found: ignore
