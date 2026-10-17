@@ -1,0 +1,95 @@
+<main class="page">
+  <header class="intro">
+    <p class="eyebrow">Angular 22 · Clean Architecture</p>
+    <h1>To-do List</h1>
+    <p>A small, working demo. The UI depends on use cases, not on how data is stored.</p>
+  </header>
+
+  <div class="layout">
+    <section class="panel" aria-labelledby="create-title">
+      <h2 id="create-title">New task</h2>
+      <form (submit)="addTodo($event)">
+        <label for="category">Category</label>
+        <input
+          #categoryInput
+          id="category"
+          type="text"
+          placeholder="Personal"
+          required
+          maxlength="40"
+          [value]="newName()"
+          (input)="newName.set(categoryInput.value)"
+        />
+
+        <label for="task-title">Task title</label>
+        <input
+          #titleInput
+          id="task-title"
+          type="text"
+          placeholder="Write a small unit test"
+          required
+          maxlength="120"
+          [value]="newTitle()"
+          (input)="newTitle.set(titleInput.value)"
+        />
+        <button class="primary" type="submit">Add task</button>
+      </form>
+
+      <p class="note">Demo data lives in memory and resets on refresh.</p>
+    </section>
+
+    <section class="panel tasks" aria-labelledby="tasks-title">
+      <div class="tasks-heading">
+        <div>
+          <h2 id="tasks-title">Your tasks</h2>
+          <p>{{ pendingCount() }} pending · {{ todos().length }} total</p>
+        </div>
+      </div>
+
+      <label for="search">Search tasks</label>
+      <input
+        #searchInput
+        id="search"
+        type="search"
+        placeholder="Search by category or title"
+        [value]="searchTerm()"
+        (input)="searchTerm.set(searchInput.value)"
+      />
+
+      @if (error(); as message) {
+        <p class="message error" role="alert">{{ message }}</p>
+      }
+
+      @if (loading()) {
+        <p class="message" role="status">Loading tasks...</p>
+      } @else if (filteredTodos().length === 0) {
+        <p class="message" role="status">
+          {{ todos().length ? 'No tasks match your search.' : 'No tasks yet. Add one to get started.' }}
+        </p>
+      } @else {
+        <ul class="todo-list">
+          @for (todo of filteredTodos(); track todo.id) {
+            <li class="todo-row">
+              <input
+                type="checkbox"
+                [checked]="todo.completed"
+                [attr.aria-label]="'Toggle completion for ' + todo.title"
+                (change)="toggleTodo(todo.id)"
+              />
+              <div class="todo-text">
+                <strong [class.done]="todo.completed">{{ todo.title }}</strong>
+                <small>{{ todo.name }} · {{ todo.completed ? 'Completed' : 'Pending' }}</small>
+              </div>
+              <button
+                class="remove"
+                type="button"
+                [attr.aria-label]="'Remove ' + todo.title"
+                (click)="removeTodo(todo.id)"
+              >Remove</button>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  </div>
+</main>
