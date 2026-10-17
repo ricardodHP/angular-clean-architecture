@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build-and-test:
@@ -17,23 +17,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - name: Install exact dependencies (lockfile present)
-        if: hashFiles('package-lock.json') != ''
+          cache: npm
+      - name: Install locked dependencies
         run: npm ci --no-audit --no-fund
-      - name: Resolve dependencies (initial bootstrap only)
-        if: hashFiles('package-lock.json') == ''
-        run: npm install --no-audit --no-fund
       - name: Production build
         run: npm run build
       - name: Unit tests
         run: npm test
-      - name: Commit initial lockfile on modernization branch
-        if: github.event_name == 'push' && github.ref == 'refs/heads/modernization/angular-22'
-        run: |
-          if [ -n "$(git status --porcelain -- package-lock.json)" ]; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add package-lock.json
-            git commit -m "build: lock Angular 22 dependencies"
-            git push origin HEAD:modernization/angular-22
-          fi

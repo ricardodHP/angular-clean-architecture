@@ -1,8 +1,8 @@
 # Angular Clean Architecture — 2026 refresh
 
-A small To-do List demonstrating how to modernize an Angular **11 (2021)** example for Angular **22 (2026)** without adding unnecessary architecture.
+A small To-do List demonstrating how to revisit an Angular **11 (2021)** codebase using Angular **22 (2026)** without adding unnecessary architecture.
 
-> **Work in progress:** The source has been reconstructed on the \`modernization/angular-22\` branch. Dependency installation, build and tests must pass in CI before this branch is considered ready to merge.
+> **Review status:** Implementation is available in the draft PR. Build and unit tests are run in GitHub Actions; review and browser verification remain necessary before merging to main.
 
 ## What the app does
 
@@ -15,7 +15,7 @@ A small To-do List demonstrating how to modernize an Angular **11 (2021)** examp
 
 ## Technology
 
-- Angular 22, standalone components, built-in control flow (\`@if\`, \`@for\`)
+- Angular 22, standalone components, built-in control flow (`@if`, `@for`)
 - Signals for presentation state; RxJS for the repository port
 - Angular's default zoneless change detection
 - Vitest tests with Angular TestBed
@@ -23,7 +23,7 @@ A small To-do List demonstrating how to modernize an Angular **11 (2021)** examp
 
 ## Structure
 
-\`\`\`text
+```text
 src/app/
   core/
     domain/             Todo entity, input validation
@@ -32,22 +32,22 @@ src/app/
   data/                 In-memory repository adapter
   features/todo/        UI component and templates
   app.config.ts         Composition root (dependency injection)
-\`\`\`
+```
 
 The dependencies point inward: presentation uses the application layer; the in-memory repository implements an application port. Core classes do not import Angular.
 
 ## Getting started
 
-Use **Node 24.15+** or Node 22.22.3+; run \`nvm use\` if you use nvm.
+Use **Node 24.15+** or Node 22.22.3+; run `nvm use` if you use nvm.
 
-\`\`\`bash
-npm install
+```bash
+npm ci
 npm start
 npm run build
 npm test
-\`\`\`
+```
 
-The first \`npm install\` creates a modern \`package-lock.json\`. Commit that lockfile after the CI checks succeed, and switch the CI install step to \`npm ci\` for reproducibility.
+The lockfile is committed and CI uses `npm ci` for reproducible installs.
 
 ## History
 

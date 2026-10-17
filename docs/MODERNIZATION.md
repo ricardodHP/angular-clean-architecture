@@ -15,16 +15,16 @@
 
 ## Dependency direction
 
-\`\`\`text
+```text
 Presentation (Angular component)
    -> Application (use cases)
       -> Port (TodoRepository) -> Domain (Todo)
          ^
          |
       Data adapter (InMemoryTodoRepository)
-\`\`\`
+```
 
-The arrows in this diagram represent source-code dependencies, not runtime call direction.
+The arrows indicate source-code dependencies, not runtime call direction.
 
 ## Why an in-memory adapter?
 
@@ -34,17 +34,22 @@ The 2021 app used a third-party endpoint in development and a localhost endpoint
 
 - No NgRx: local component Signals are sufficient.
 - No API, database, authentication or persistence: this is a small architecture example.
-- No mapper until the input and persistence schemas actually differ.
+- No mapper until input and persistence schemas differ.
 - No Angular dependency in core domain or use-case logic.
 - No use case class per CRUD operation.
 - No business rule for every single repository function.
 - Not a migration recipe from Angular 11 directly to 22 for production systems; this is a clean rebuild retaining the historical business scope and Git history.
 
-## Next gates
+## Validation
 
-- [ ] Verify npm dependency installation and regenerate lockfile.
-- [ ] Verify production build and all tests in GitHub Actions.
-- [ ] Switch CI to npm ci once lockfile is committed.
-- [ ] Review mobile layout and basic keyboard accessibility.
-- [ ] Add test cases for deletion, filtering empty states and failed repository mutations.
-- [ ] Write a LinkedIn post that accurately contrasts the 2021 code and the 2026 decisions.
+- [x] Angular 22 dependencies installed and locked.
+- [x] GitHub Actions production build passed (initial validation).
+- [x] Domain, use case, and component tests passed (initial validation).
+- [x] GitHub Actions configured for npm ci.
+- [ ] Verify the updated tests and npm ci on the newest commit.
+- [ ] Manual browser review on desktop and mobile.
+- [ ] Keyboard accessibility smoke test.
+- [ ] Review input validation and presentation of repository errors.
+- [ ] Write LinkedIn Before/After post from actual, reviewed code.
+
+The PR is kept as a draft until the remaining gates pass.
