@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 import { ToDoListUsesCases } from '../../core/usescases/to-do-list-uses-cases';
@@ -16,6 +17,7 @@ describe('ToDoListComponent', () => {
   beforeEach(async () => {
     useCases = jasmine.createSpyObj('ToDoListUsesCases', ['findAllTodo']);
     await TestBed.configureTestingModule({
+      imports: [CommonModule],
       declarations: [ToDoListComponent],
       providers: [{ provide: ToDoListUsesCases, useValue: useCases }]
     }).compileComponents();
