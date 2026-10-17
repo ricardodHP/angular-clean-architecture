@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
-import { mkdir } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
+import axe from 'axe-core';
 import { chromium } from 'playwright';
 
 const baseUrl = process.env.E2E_BASE_URL ?? 'http://127.0.0.1:4200/';
@@ -24,6 +25,18 @@ async function waitForRows(page, count) {
   );
 }
 
+async function auditAccessibility(page, label) {
+  await page.addScriptTag({ content: axe.source });
+  const { violations } = await page.evaluate(async () => window.axe.run(document, {
+    runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa'] }
+  }));
+  await writeFile(outputDir + '/accessibility-' + label + '.json',
+    JSON.stringify(violations, null, 2));
+  const details = violations.map(issue =>
+    issue.id + ': ' + issue.nodes.map(node => node.target.join(' ')).join(', '));
+  assert.deepEqual(details, [], 'Accessibility issues in ' + label + ': ' + details.join('; '));
+}
+
 async function run() {
   const desktop = await browser.newPage({ viewport: { width: 1440, height: 900 } });
   const pageErrors = [];
@@ -35,6 +48,7 @@ async function run() {
   assert.match(await desktop.locator('.tasks-heading').innerText(), /2 pending/);
   await checkNoHorizontalOverflow(desktop, 'desktop');
   await desktop.screenshot({ path: outputDir + '/01-desktop-initial.png', fullPage: true });
+  await auditAccessibility(desktop, 'desktop');
 
   // The checkbox changes both the UI and the repository's task state.
   await desktop.getByRole('checkbox', { name: 'Toggle completion for Write unit tests for use cases' }).check();
@@ -68,6 +82,13 @@ async function run() {
   await desktop.keyboard.press('Tab');
   assert.strictEqual(await desktop.evaluate(() => document.activeElement?.id),
     'task-title', 'Keyboard Tab should reach the title input');
+  // Whitespace-only values are rejected by the use case even if native required checks allow them.
+  await desktop.getByRole('textbox', { name: 'Category' }).fill('Home');
+  await desktop.getByRole('textbox', { name: 'Task title' }).fill('   ');
+  await desktop.getByRole('button', { name: 'Add task' }).click();
+  await desktop.getByRole('alert').waitFor();
+  assert.match(await desktop.getByRole('alert').innerText(), /required/);
+  await waitForRows(desktop, 3);
   assert.deepEqual(pageErrors, [], 'Unexpected desktop browser errors: ' + pageErrors.join('; '));
 
   const mobile = await browser.newPage({
@@ -82,6 +103,7 @@ async function run() {
   await waitForRows(mobile, 3);
   await checkNoHorizontalOverflow(mobile, 'mobile initial');
   await mobile.screenshot({ path: outputDir + '/03-mobile-initial.png', fullPage: true });
+  await auditAccessibility(mobile, 'mobile');
   await mobile.getByRole('textbox', { name: 'Category' }).fill('Personal');
   await mobile.getByRole('textbox', { name: 'Task title' }).fill('Test mobile layout');
   await mobile.getByRole('button', { name: 'Add task' }).click();

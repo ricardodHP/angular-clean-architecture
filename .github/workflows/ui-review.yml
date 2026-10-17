@@ -21,7 +21,7 @@ jobs:
       - name: Install locked project dependencies
         run: npm ci --no-audit --no-fund
       - name: Install pinned browser automation (not a project dependency)
-        run: npm install --no-save --package-lock=false --no-audit --no-fund playwright@1.56.1
+        run: npm install --no-save --package-lock=false --no-audit --no-fund playwright@1.56.1 axe-core@4.10.3
       - name: Confirm Chrome availability
         run: google-chrome --version
       - name: Start Angular application
