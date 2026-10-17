@@ -20,7 +20,7 @@ describe('ToDoListWebRepository', () => {
 
     repository.findAllTodo().subscribe(items => received = items);
     const request = http.expectOne(environment.apiUrl + '/todo');
-    request.expect('GET');
+    expect(request.request.method).toBe('GET');
     request.flush([
       { id: 1, name: 'Home', title: 'Buy groceries', completed: false },
       { id: 2, name: 'Work', title: 'Review PR', completed: true }
